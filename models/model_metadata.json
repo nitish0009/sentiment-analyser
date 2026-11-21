@@ -1,0 +1,407 @@
+{
+  "project": "Sentiment Analysis System",
+  "model_name": "Logistic Regression",
+  "model_key": "logistic_regression",
+  "trained_at_utc": "2026-11-20 16:45:00 UTC",
+  "labels": {
+    "id_to_label": {
+      "0": "negative",
+      "1": "positive"
+    },
+    "label_to_id": {
+      "negative": 0,
+      "positive": 1
+    },
+    "supported_classes": [
+      "negative",
+      "positive"
+    ],
+    "neutral_supported": false
+  },
+  "dataset": {
+    "name": "IMDb Movie Reviews (50,000 reviews)",
+    "citation": "Andrew L. Maas, Raymond E. Daly, Peter T. Pham, Dan Huang, Andrew Y. Ng, and Christopher Potts. 2011. Learning Word Vectors for Sentiment Analysis. ACL 2011.",
+    "summary": {
+      "source_file": "/Users/nitish/Desktop/sentiment analyzer/data/dataset.csv",
+      "rows_loaded": 50000,
+      "missing_reviews": 0,
+      "missing_labels": 0,
+      "invalid_labels": 0,
+      "empty_reviews": 0,
+      "duplicates_removed": 418,
+      "final_rows": 49582,
+      "positive_reviews": 24884,
+      "negative_reviews": 24698,
+      "average_words": 231.35,
+      "median_words": 173.0
+    }
+  },
+  "split": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "stratified": true,
+    "train_rows": 39665,
+    "test_rows": 9917,
+    "train_class_counts": {
+      "negative": 19758,
+      "positive": 19907
+    },
+    "test_class_counts": {
+      "negative": 4940,
+      "positive": 4977
+    }
+  },
+  "preprocessing": {
+    "steps": [
+      "Normalise apostrophes",
+      "Expand common English contractions",
+      "Unescape HTML entities and remove HTML tags",
+      "Remove URLs and e-mail addresses",
+      "Lowercase",
+      "Remove non-letter characters",
+      "Collapse whitespace",
+      "Tokenise with NLTK word_tokenize",
+      "Remove NLTK English stop-words, preserving negations/intensifiers",
+      "Apply NLTK Porter stemming"
+    ],
+    "stemmer": "NLTK PorterStemmer",
+    "stop_words": "NLTK English stop-word list (198 words) minus sentiment keep-words",
+    "negations_preserved": [
+      "not",
+      "no",
+      "nor",
+      "never",
+      "none",
+      "nothing",
+      "neither",
+      "nowhere",
+      "cannot",
+      "without"
+    ]
+  },
+  "tfidf": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "max_features_requested": 50000,
+    "n_features_learned": 50000,
+    "min_df": 2,
+    "max_df": 0.95,
+    "sublinear_tf": true,
+    "lowercase": false,
+    "fitted_on": "training split only"
+  },
+  "models": {
+    "naive_bayes": {
+      "display_name": "Naive Bayes",
+      "training_seconds": 0.02,
+      "metrics": {
+        "accuracy": 0.8779,
+        "precision": 0.878,
+        "recall": 0.8779,
+        "f1_score": 0.8779,
+        "precision_macro": 0.878,
+        "recall_macro": 0.8779,
+        "f1_macro": 0.8779,
+        "positive_class": {
+          "precision": 0.873,
+          "recall": 0.8855,
+          "f1_score": 0.8792
+        },
+        "confusion_matrix": [
+          [
+            4299,
+            641
+          ],
+          [
+            570,
+            4407
+          ]
+        ],
+        "classification_report": {
+          "Negative": {
+            "precision": 0.8829328404189772,
+            "recall": 0.870242914979757,
+            "f1-score": 0.8765419512692425,
+            "support": 4940.0
+          },
+          "Positive": {
+            "precision": 0.8730190174326465,
+            "recall": 0.8854731766124171,
+            "f1-score": 0.8792019950124689,
+            "support": 4977.0
+          },
+          "accuracy": 0.8778864575980639,
+          "macro avg": {
+            "precision": 0.8779759289258119,
+            "recall": 0.8778580457960871,
+            "f1-score": 0.8778719731408557,
+            "support": 9917.0
+          },
+          "weighted avg": {
+            "precision": 0.8779574348524786,
+            "recall": 0.8778864575980639,
+            "f1-score": 0.8778769354086031,
+            "support": 9917.0
+          }
+        },
+        "support": 9917
+      }
+    },
+    "logistic_regression": {
+      "display_name": "Logistic Regression",
+      "training_seconds": 0.72,
+      "metrics": {
+        "accuracy": 0.8965,
+        "precision": 0.8968,
+        "recall": 0.8965,
+        "f1_score": 0.8965,
+        "precision_macro": 0.8968,
+        "recall_macro": 0.8965,
+        "f1_macro": 0.8965,
+        "positive_class": {
+          "precision": 0.8877,
+          "recall": 0.9088,
+          "f1_score": 0.8981
+        },
+        "confusion_matrix": [
+          [
+            4368,
+            572
+          ],
+          [
+            454,
+            4523
+          ]
+        ],
+        "classification_report": {
+          "Negative": {
+            "precision": 0.9058481957693902,
+            "recall": 0.8842105263157894,
+            "f1-score": 0.8948985863552551,
+            "support": 4940.0
+          },
+          "Positive": {
+            "precision": 0.8877330716388616,
+            "recall": 0.908780389793048,
+            "f1-score": 0.8981334392374901,
+            "support": 4977.0
+          },
+          "accuracy": 0.8965412927296561,
+          "macro avg": {
+            "precision": 0.8967906337041259,
+            "recall": 0.8964954580544187,
+            "f1-score": 0.8965160127963726,
+            "support": 9917.0
+          },
+          "weighted avg": {
+            "precision": 0.8967568402387216,
+            "recall": 0.8965412927296561,
+            "f1-score": 0.8965220473610919,
+            "support": 9917.0
+          }
+        },
+        "support": 9917
+      }
+    }
+  },
+  "selected_metrics": {
+    "accuracy": 0.8965,
+    "precision": 0.8968,
+    "recall": 0.8965,
+    "f1_score": 0.8965,
+    "precision_macro": 0.8968,
+    "recall_macro": 0.8965,
+    "f1_macro": 0.8965,
+    "positive_class": {
+      "precision": 0.8877,
+      "recall": 0.9088,
+      "f1_score": 0.8981
+    },
+    "confusion_matrix": [
+      [
+        4368,
+        572
+      ],
+      [
+        454,
+        4523
+      ]
+    ],
+    "classification_report": {
+      "Negative": {
+        "precision": 0.9058481957693902,
+        "recall": 0.8842105263157894,
+        "f1-score": 0.8948985863552551,
+        "support": 4940.0
+      },
+      "Positive": {
+        "precision": 0.8877330716388616,
+        "recall": 0.908780389793048,
+        "f1-score": 0.8981334392374901,
+        "support": 4977.0
+      },
+      "accuracy": 0.8965412927296561,
+      "macro avg": {
+        "precision": 0.8967906337041259,
+        "recall": 0.8964954580544187,
+        "f1-score": 0.8965160127963726,
+        "support": 9917.0
+      },
+      "weighted avg": {
+        "precision": 0.8967568402387216,
+        "recall": 0.8965412927296561,
+        "f1-score": 0.8965220473610919,
+        "support": 9917.0
+      }
+    },
+    "support": 9917
+  },
+  "selection_rule": "Highest weighted F1-score on the held-out test set; accuracy is used as a tie-breaker.",
+  "top_features": {
+    "positive": [
+      {
+        "token": "great",
+        "weight": 8.4896
+      },
+      {
+        "token": "excel",
+        "weight": 7.257
+      },
+      {
+        "token": "enjoy",
+        "weight": 5.6043
+      },
+      {
+        "token": "perfect",
+        "weight": 5.5129
+      },
+      {
+        "token": "best",
+        "weight": 5.4266
+      },
+      {
+        "token": "love",
+        "weight": 5.4145
+      },
+      {
+        "token": "one best",
+        "weight": 4.8047
+      },
+      {
+        "token": "beauti",
+        "weight": 4.7826
+      },
+      {
+        "token": "favorit",
+        "weight": 4.6263
+      },
+      {
+        "token": "amaz",
+        "weight": 4.6218
+      },
+      {
+        "token": "brilliant",
+        "weight": 4.4301
+      },
+      {
+        "token": "hilari",
+        "weight": 4.3533
+      },
+      {
+        "token": "fun",
+        "weight": 4.1466
+      },
+      {
+        "token": "today",
+        "weight": 4.0062
+      },
+      {
+        "token": "superb",
+        "weight": 3.9433
+      }
+    ],
+    "negative": [
+      {
+        "token": "worst",
+        "weight": -9.632
+      },
+      {
+        "token": "bad",
+        "weight": -8.932
+      },
+      {
+        "token": "wast",
+        "weight": -8.0556
+      },
+      {
+        "token": "aw",
+        "weight": -7.7932
+      },
+      {
+        "token": "bore",
+        "weight": -7.502
+      },
+      {
+        "token": "poor",
+        "weight": -6.3951
+      },
+      {
+        "token": "terribl",
+        "weight": -6.351
+      },
+      {
+        "token": "disappoint",
+        "weight": -5.9744
+      },
+      {
+        "token": "noth",
+        "weight": -5.7684
+      },
+      {
+        "token": "stupid",
+        "weight": -5.1678
+      },
+      {
+        "token": "wors",
+        "weight": -5.1291
+      },
+      {
+        "token": "horribl",
+        "weight": -5.0524
+      },
+      {
+        "token": "no",
+        "weight": -4.8758
+      },
+      {
+        "token": "dull",
+        "weight": -4.8194
+      },
+      {
+        "token": "fail",
+        "weight": -4.647
+      }
+    ],
+    "score_label": "Logistic Regression coefficient"
+  },
+  "timing_seconds": {
+    "preprocess_train": 33.26,
+    "preprocess_test": 8.23,
+    "tfidf_fit_transform": 13.59,
+    "training": {
+      "naive_bayes": 0.02,
+      "logistic_regression": 0.72
+    }
+  },
+  "versions": {
+    "python": "3.14.4",
+    "scikit_learn": "1.8.0",
+    "nltk": "3.10.4",
+    "pandas": "3.0.2",
+    "numpy": "2.4.4",
+    "joblib": "1.5.3"
+  },
+  "notes": "The dataset contains only positive and negative reviews. The model therefore does not predict a neutral class. Low-confidence predictions are flagged in the UI instead of being forced into a neutral category."
+}

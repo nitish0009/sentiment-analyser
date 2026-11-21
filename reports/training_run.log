@@ -1,0 +1,94 @@
+
+========================================================================
+1. LOADING AND CLEANING THE DATASET
+========================================================================
+Dataset          : IMDb Movie Reviews (50,000 reviews)
+Rows loaded      : 50,000
+Missing reviews  : 0
+Missing labels   : 0
+Invalid labels   : 0
+Empty reviews    : 0
+Duplicates       : 418
+Rows after clean : 49,582
+Positive         : 24,884 (50.2%)
+Negative         : 24,698 (49.8%)
+Average words    : 231.3 per review
+Median words     : 173.0 per review
+Saved class chart: /Users/nitish/Desktop/sentiment analyzer/reports/class_distribution.png
+
+========================================================================
+2. TRAIN / TEST SPLIT
+========================================================================
+Training reviews : 39,665
+Test reviews     : 9,917
+Training classes : negative=19,758, positive=19,907
+Test classes     : negative=4,940, positive=4,977
+
+========================================================================
+3. TEXT PREPROCESSING
+========================================================================
+Steps: lowercase -> HTML/URL removal -> contractions -> tokenise ->
+       stop-word removal (negations kept) -> Porter stemming
+Preprocessing 39,665 training reviews ...
+   5,000 / 39,665
+  10,000 / 39,665
+  15,000 / 39,665
+  20,000 / 39,665
+  25,000 / 39,665
+  30,000 / 39,665
+  35,000 / 39,665
+  39,665 / 39,665
+  done in 33.3s
+Preprocessing 9,917 test reviews ...
+   5,000 / 9,917
+   9,917 / 9,917
+  done in 8.2s
+Empty after cleaning: train=0, test=0
+
+========================================================================
+4. TF-IDF FEATURE EXTRACTION
+========================================================================
+TF-IDF train matrix: 39,665 x 50,000
+TF-IDF test matrix : 9,917 x 50,000
+Non-zero train values: 5,178,202
+TF-IDF fit/transform time: 13.6s
+
+========================================================================
+5. MODEL TRAINING AND EVALUATION
+========================================================================
+
+Training Naive Bayes ...
+  Training time : 0.0s
+  Accuracy      : 0.8779
+  Precision (w) : 0.8780
+  Recall (w)    : 0.8779
+  F1-score (w)  : 0.8779
+  Confusion matrix [[TN, FP], [FN, TP]]: [[4299, 641], [570, 4407]]
+
+Training Logistic Regression ...
+  Training time : 0.7s
+  Accuracy      : 0.8965
+  Precision (w) : 0.8968
+  Recall (w)    : 0.8965
+  F1-score (w)  : 0.8965
+  Confusion matrix [[TN, FP], [FN, TP]]: [[4368, 572], [454, 4523]]
+
+========================================================================
+6. SELECTING AND SAVING THE BEST MODEL
+========================================================================
+Selected model: Logistic Regression
+Reason: highest weighted F1-score on the test set (0.8965); accuracy 0.8965.
+Saved model      : /Users/nitish/Desktop/sentiment analyzer/models/sentiment_model.pkl
+Saved vectorizer : /Users/nitish/Desktop/sentiment analyzer/models/tfidf_vectorizer.pkl
+
+========================================================================
+TRAINING COMPLETE
+========================================================================
+Best model       : Logistic Regression
+Test accuracy    : 0.8965
+Weighted F1      : 0.8965
+Metadata         : /Users/nitish/Desktop/sentiment analyzer/models/model_metadata.json
+Charts/reports   : /Users/nitish/Desktop/sentiment analyzer/reports
+
+Start the web app with:
+    streamlit run app.py

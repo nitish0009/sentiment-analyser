@@ -1,0 +1,14 @@
+Classification Report - Logistic Regression
+============================================================
+
+              precision  recall  f1-score   support
+Negative         0.9058  0.8842    0.8949 4940.0000
+Positive         0.8877  0.9088    0.8981 4977.0000
+accuracy         0.8965  0.8965    0.8965    0.8965
+macro avg        0.8968  0.8965    0.8965 9917.0000
+weighted avg     0.8968  0.8965    0.8965 9917.0000
+
+Notes:
+- precision/recall/f1 columns per class are shown above.
+- macro avg gives every class equal weight.
+- weighted avg accounts for class support (size).

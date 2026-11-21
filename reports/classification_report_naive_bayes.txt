@@ -1,0 +1,14 @@
+Classification Report - Naive Bayes
+============================================================
+
+              precision  recall  f1-score   support
+Negative         0.8829  0.8702    0.8765 4940.0000
+Positive         0.8730  0.8855    0.8792 4977.0000
+accuracy         0.8779  0.8779    0.8779    0.8779
+macro avg        0.8780  0.8779    0.8779 9917.0000
+weighted avg     0.8780  0.8779    0.8779 9917.0000
+
+Notes:
+- precision/recall/f1 columns per class are shown above.
+- macro avg gives every class equal weight.
+- weighted avg accounts for class support (size).

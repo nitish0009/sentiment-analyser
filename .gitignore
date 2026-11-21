@@ -1,0 +1,20 @@
+# Local environment
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+
+# Raw dataset download (the CSV is sufficient for training)
+data/dataset.csv
+data/aclImdb_v1.tar.gz
+data/raw/
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# Logs / temporary files
+*.log
+!reports/training_run.log
