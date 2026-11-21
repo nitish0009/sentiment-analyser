@@ -27,7 +27,7 @@ app starts successfully.
 3. Start the app:
 
    ```bash
-   python -m streamlit run app.py
+   python -m streamlit run streamlit_app.py
    ```
 
 4. Open <http://127.0.0.1:8501> and wait for the sidebar badge **Model ready**.

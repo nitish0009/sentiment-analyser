@@ -210,7 +210,7 @@ def main() -> int:
         "\nNext step:\n"
         "    python src/train.py\n"
         "Then launch the app:\n"
-        "    python -m streamlit run app.py"
+        "    python -m streamlit run streamlit_app.py"
     )
     return 0
 

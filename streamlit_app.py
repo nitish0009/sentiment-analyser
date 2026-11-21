@@ -2,7 +2,7 @@
 
 Run from the project root:
 
-    python -m streamlit run app.py
+    python -m streamlit run streamlit_app.py
 
 Pages
 -----
@@ -680,7 +680,7 @@ def _missing_model_notice(error: str | None = None) -> None:
         st.caption(error)
     st.markdown("Run these commands from the project root:")
     st.code(
-        "python scripts/download_dataset.py\npython src/train.py\npython -m streamlit run app.py",
+        "python scripts/download_dataset.py\npython src/train.py\npython -m streamlit run streamlit_app.py",
         language="bash",
     )
     st.info(
@@ -1345,7 +1345,7 @@ def render_performance() -> None:
         The split is deterministic, so re-running training should reproduce the same
         numbers (up to tiny library-level variations).<br><br>
         <code>python src/train.py</code><br>
-        <code>python -m streamlit run app.py</code><br><br>
+        <code>python -m streamlit run streamlit_app.py</code><br><br>
         Total training time recorded: preprocess
         <strong>{metadata.get('timing_seconds', {}).get('preprocess_train', 0):.1f}s</strong>,
         vectorise <strong>{metadata.get('timing_seconds', {}).get('tfidf_fit_transform', 0):.1f}s</strong>.

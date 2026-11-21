@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Binary sentiment analysis of movie reviews using TF-IDF, Multinomial Naive Bayes and Logistic Regression.">
+    <title>Sentiment Analysis System</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="#top" aria-label="Sentiment Analysis System home">
+            <span class="brand-mark">SA</span>
+            <span class="brand-copy">
+                <strong>Sentiment Analysis</strong>
+                <small>Classical NLP &middot; ML</small>
+            </span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a href="#analyzer">Analyzer</a>
+            <a href="#performance">Performance</a>
+            <a href="#method">Method</a>
+            <span class="status-pill" id="model-status">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span id="model-status-text">Checking model</span>
+            </span>
+        </nav>
+    </div>
+</header>
+
+<main id="top">
+    <section class="hero">
+        <div class="container hero-inner">
+            <p class="hero-eyebrow">Classical NLP &middot; Machine Learning</p>
+            <h1>Sentiment Analysis System</h1>
+            <p class="hero-lead">
+                A binary text classifier that reads a movie review and predicts whether it is
+                positive or negative, with a transparent confidence score.
+            </p>
+            <div class="hero-actions">
+                <a class="button button-primary" href="#analyzer">Try the analyzer</a>
+                <a class="button button-ghost" href="#performance">View measured results</a>
+            </div>
+            <div class="tag-row" aria-label="Technologies used">
+                <span class="tag">Python</span>
+                <span class="tag">scikit-learn</span>
+                <span class="tag">NLTK</span>
+                <span class="tag">TF-IDF</span>
+                <span class="tag">Flask</span>
+                <span class="tag">No LLMs</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="analyzer">
+        <div class="container">
+            <div class="section-heading">
+                <p class="eyebrow">Live prediction</p>
+                <h2>Sentiment Analyzer</h2>
+                <p>
+                    The saved Logistic Regression model cleans the text with the exact same
+                    pipeline used during training, then returns a label and class probabilities.
+                </p>
+            </div>
+
+            <div id="api-error" class="error-banner" role="alert" hidden></div>
+
+            <div class="analyzer-grid">
+                <div class="card input-card">
+                    <div class="card-head">
+                        <h3>Your text</h3>
+                        <span class="counter" id="char-count">0 / 5,000</span>
+                    </div>
+                    <label class="visually-hidden" for="review-input">Review text</label>
+                    <textarea id="review-input" maxlength="5000" spellcheck="true"
+                        placeholder="Example: The acting was brilliant and the story kept me engaged from beginning to end..."></textarea>
+                    <div class="actions">
+                        <button class="button button-primary" id="analyze-button" type="button">
+                            Analyze sentiment
+                        </button>
+                        <button class="button button-secondary" id="clear-button" type="button">
+                            Clear
+                        </button>
+                    </div>
+                    <div class="examples">
+                        <span class="examples-label">Try an example</span>
+                        <div class="example-buttons">
+                            <button type="button" class="chip" data-sample="positive-film">Positive film</button>
+                            <button type="button" class="chip" data-sample="negative-film">Negative film</button>
+                            <button type="button" class="chip" data-sample="positive-product">Positive product</button>
+                            <button type="button" class="chip" data-sample="low-confidence">Mixed review</button>
+                        </div>
+                    </div>
+                    <p class="hint">Short clear opinions work well. Press Ctrl/Cmd + Enter to analyze.</p>
+                </div>
+
+                <div class="result-panel empty" id="result-panel" aria-live="polite">
+                    <div class="empty-state">
+                        <div class="empty-rule" aria-hidden="true"></div>
+                        <h3>Your prediction will appear here</h3>
+                        <p>Type a review and press <strong>Analyze sentiment</strong> to see the predicted class, confidence and probability split.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notice">
+                <strong>Why no neutral result?</strong>
+                IMDb reviews are labelled only positive or negative. Adding a neutral class would
+                require neutral training data and a separately evaluated model, so this project
+                reports the two supported classes honestly.
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-tinted" id="performance">
+        <div class="container">
+            <div class="section-heading">
+                <p class="eyebrow">Evaluation dashboard</p>
+                <h2>Model Performance</h2>
+                <p>
+                    Every number below was measured on a stratified, held-out 20% test split.
+                    The test set was not used to fit the vectorizer or either classifier.
+                </p>
+            </div>
+
+            <div class="selected-banner">
+                <div>
+                    <span class="pill">Selected model</span>
+                    <h3 id="selected-model-name">Logistic Regression</h3>
+                    <p id="selected-model-note">
+                        Selected by the highest weighted F1-score on the held-out test set.
+                    </p>
+                </div>
+                <div class="selected-score">
+                    <strong id="selected-accuracy">&mdash;</strong>
+                    <span>test accuracy</span>
+                </div>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-label">Accuracy</span>
+                    <strong id="metric-accuracy">&mdash;</strong>
+                    <span class="metric-note">Overall correct predictions</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Precision</span>
+                    <strong id="metric-precision">&mdash;</strong>
+                    <span class="metric-note">Weighted average</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Recall</span>
+                    <strong id="metric-recall">&mdash;</strong>
+                    <span class="metric-note">Weighted average</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">F1-score</span>
+                    <strong id="metric-f1">&mdash;</strong>
+                    <span class="metric-note">Weighted average</span>
+                </div>
+            </div>
+            <p class="metric-caption" id="metric-caption">
+                Measured on the held-out test reviews. Precision, recall and F1 are weighted by class support.
+            </p>
+
+            <div class="card table-card">
+                <div class="card-head">
+                    <h3>Naive Bayes vs Logistic Regression</h3>
+                    <span class="soft-label">Test-set scores</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Model</th>
+                                <th scope="col">Accuracy</th>
+                                <th scope="col">Precision</th>
+                                <th scope="col">Recall</th>
+                                <th scope="col">F1</th>
+                                <th scope="col">Selected</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparison-body">
+                            <tr>
+                                <td colspan="6" class="table-loading">Loading measured results&hellip;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-note">Scores are fractions between 0 and 1. The selected model is marked in the final column.</p>
+            </div>
+
+            <div class="chart-grid">
+                <figure class="chart-card chart-wide">
+                    <img src="/reports/model_comparison.png" alt="Accuracy, precision, recall and F1 comparison for both models" loading="lazy">
+                    <figcaption>Both models use the same split, preprocessing and TF-IDF matrix.</figcaption>
+                </figure>
+                <figure class="chart-card">
+                    <img src="/reports/confusion_matrix_logistic_regression.png" alt="Confusion matrix for Logistic Regression on the held-out test set" loading="lazy">
+                    <figcaption>Logistic Regression confusion matrix.</figcaption>
+                </figure>
+                <figure class="chart-card">
+                    <img src="/reports/confusion_matrix_naive_bayes.png" alt="Confusion matrix for Multinomial Naive Bayes on the held-out test set" loading="lazy">
+                    <figcaption>Multinomial Naive Bayes confusion matrix.</figcaption>
+                </figure>
+                <figure class="chart-card chart-wide">
+                    <img src="/reports/top_features.png" alt="Top positive and negative TF-IDF features learned by the selected model" loading="lazy">
+                    <figcaption>Strongest learned unigram and bigram features.</figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="method">
+        <div class="container">
+            <div class="section-heading">
+                <p class="eyebrow">Reproducible method</p>
+                <h2>Dataset and Pipeline</h2>
+                <p>
+                    The model is trained offline and served from saved Joblib artifacts. The web
+                    application never retrains while a request is waiting.
+                </p>
+            </div>
+
+            <div class="method-grid">
+                <article class="card method-card">
+                    <span class="step-label">Dataset</span>
+                    <h3 id="dataset-title">IMDb Movie Reviews</h3>
+                    <dl class="detail-list">
+                        <div><dt>Raw rows</dt><dd id="dataset-rows">&mdash;</dd></div>
+                        <div><dt>Duplicates removed</dt><dd id="dataset-duplicates">&mdash;</dd></div>
+                        <div><dt>Clean rows</dt><dd id="dataset-clean">&mdash;</dd></div>
+                        <div><dt>Positive / negative</dt><dd id="dataset-balance">&mdash;</dd></div>
+                        <div><dt>Average review length</dt><dd id="dataset-length">&mdash;</dd></div>
+                    </dl>
+                </article>
+
+                <article class="card method-card">
+                    <span class="step-label">Split and features</span>
+                    <h3>Leakage-free TF-IDF</h3>
+                    <dl class="detail-list">
+                        <div><dt>Train / test rows</dt><dd id="split-rows">&mdash;</dd></div>
+                        <div><dt>Split</dt><dd id="split-strategy">&mdash;</dd></div>
+                        <div><dt>Random state</dt><dd id="split-random">&mdash;</dd></div>
+                        <div><dt>TF-IDF features</dt><dd id="tfidf-features">&mdash;</dd></div>
+                        <div><dt>N-grams</dt><dd id="tfidf-ngrams">&mdash;</dd></div>
+                        <div><dt>Fitted on</dt><dd id="tfidf-fitted">&mdash;</dd></div>
+                    </dl>
+                </article>
+
+                <article class="card method-card">
+                    <span class="step-label">Reproducibility</span>
+                    <h3>Training and serving</h3>
+                    <p class="method-copy">
+                        Training produces the classifier, vectorizer and metadata. The API loads
+                        these saved artifacts and applies the shared preprocessing function before
+                        every prediction.
+                    </p>
+                    <ul class="plain-list">
+                        <li>Binary labels only; no fabricated neutral class.</li>
+                        <li>Low-confidence predictions are flagged below 60%.</li>
+                        <li>No BERT, transformers, paid APIs or external inference services.</li>
+                        <li>The Streamlit version remains available for local demonstrations.</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <div>
+            <strong>Sentiment Analysis System</strong>
+            <p>Binary sentiment classification with classical NLP.</p>
+        </div>
+        <p class="footer-note">
+            Built with Python, scikit-learn, NLTK, TF-IDF and Flask.
+            Model trained on the IMDb 50K movie-review dataset.
+        </p>
+    </div>
+</footer>
+
+<noscript>
+    <div class="noscript">This analyzer needs JavaScript enabled to send a review to the prediction API.</div>
+</noscript>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

@@ -35,13 +35,13 @@ If starting from a fresh clone:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 
 python scripts/setup_nltk.py
 python scripts/download_dataset.py
 python src/train.py
 
-python -m streamlit run app.py
+python -m streamlit run streamlit_app.py
 ```
 
 If the `models/` directory already contains the trained artifacts, you can skip
@@ -96,11 +96,21 @@ No BERT, transformers, LLMs, paid APIs or external inference services are used.
 
 ```text
 sentiment analyzer/
-├── app.py                     # Streamlit UI (4 pages, custom CSS)
-├── requirements.txt
+├── streamlit_app.py          # Streamlit UI for local demonstrations
+├── server.py                 # Flask API used by the Vercel deployment
+├── vercel.json               # Vercel function bundle configuration
+├── .python-version           # Python 3.14 for Vercel
+├── requirements.txt          # Slim runtime deps used by Vercel
+├── requirements-local.txt    # Streamlit + training dependencies
 ├── README.md
-├── evaluation_report.md       # Detailed measured evaluation
-├── .streamlit/config.toml     # Theme + usage-statistics setting
+├── evaluation_report.md      # Detailed measured evaluation
+├── .streamlit/config.toml    # Theme + usage-statistics setting
+├── public/
+│   ├── index.html            # Vercel-compatible static analyzer UI
+│   ├── styles.css
+│   ├── app.js
+│   └── reports/              # Evaluation charts served by the CDN
+├── nltk_data/                # English stop-words + punkt_tab bundle
 ├── data/
 │   ├── README.md              # Dataset download notes
 │   └── dataset.csv            # Generated locally; ignored by git
@@ -154,7 +164,7 @@ sentiment analyzer/
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 ```
 
 > If `streamlit` is not on your PATH, use `python -m streamlit` instead of
@@ -212,7 +222,7 @@ python src/train.py --test-size 0.2 --max-features 50000
 ### 6. Run the application
 
 ```bash
-python -m streamlit run app.py
+python -m streamlit run streamlit_app.py
 ```
 
 Then open <http://localhost:8501>.
@@ -247,6 +257,71 @@ short usage guide.
 ### Sample Reviews
 Six clear positive/negative examples plus three tricky cases. Every card loads
 the text into the analyzer and runs the saved model automatically.
+
+---
+
+## Deploy on Vercel
+
+Vercel cannot host the Streamlit server itself because Streamlit needs a
+long-lived WebSocket server, while Vercel Functions are short-lived requests.
+This repository therefore includes a separate Vercel-compatible entrypoint:
+
+- `server.py` — a small Flask JSON API that loads the same saved model.
+- `public/` — a static HTML/CSS/JS frontend served by Vercel's CDN.
+- `nltk_data/` — the English stop-words and `punkt_tab` files needed by the
+  shared preprocessing function.
+
+The local Streamlit app remains available; it is not used by Vercel.
+
+### Manual deployment from GitHub
+
+1. Commit and push the current repository to `main`.
+2. In Vercel, choose **Add New → Project** and import
+   `nitish0009/sentiment-analyser`.
+3. Keep the repository root as the project root.
+4. Framework Preset: **Flask** (Vercel should detect it from `requirements.txt`).
+5. Build Command: leave empty.
+6. Output Directory: leave empty. Vercel serves `public/` at the site root and
+   builds the `server.py` function automatically.
+7. Install Command: leave the default (`pip install -r requirements.txt`).
+8. Press **Deploy**.
+
+If an old failed deployment is cached, open the project's **Deployments** page,
+choose **Redeploy**, and enable **Clear build cache**. The original `app.py`
+entrypoint error will not recur because the Streamlit file is now named
+`streamlit_app.py`, while Vercel loads the top-level Flask `app` from `server.py`.
+
+### Manual deployment with the CLI
+
+```bash
+npm install -g vercel
+vercel
+vercel --prod
+```
+
+The API routes are:
+
+```text
+GET  /api/health
+GET  /api/metadata
+POST /api/predict      {"text": "This movie was excellent."}
+```
+
+The static frontend is at `/`. The Streamlit version is still run locally with:
+
+```bash
+python -m streamlit run streamlit_app.py
+```
+
+### Test the deployment version locally
+
+```bash
+pip install -r requirements-local.txt
+SERVE_STATIC=1 python -m flask --app server run --port 8000
+```
+
+Open <http://127.0.0.1:8000>. This uses the same API and static frontend that
+Vercel serves.
 
 ---
 
@@ -350,7 +425,7 @@ chmod -R go-w ~/nltk_data
 Use the module form:
 
 ```bash
-python -m streamlit run app.py
+python -m streamlit run streamlit_app.py
 ```
 
 ### Charts do not appear / media endpoint returns HTTP 500
@@ -377,6 +452,23 @@ NLTK tokenisation and stemming are CPU-bound. The reference run took about
 **33 seconds** to preprocess 39,665 training reviews and **8 seconds** for the
 9,917 test reviews. Later runs reuse cached NLTK data but still preprocess the
 text.
+
+### `PYTHON_ENTRYPOINT_NOT_FOUND` on Vercel
+
+The original root file was `app.py`, which was a Streamlit application. Vercel
+looks for a top-level `app`, `application` or `handler` WSGI/ASGI object, and
+Streamlit is not one of those servers. The deployment version now uses
+`server.py` (Flask), while the Streamlit file is `streamlit_app.py`.
+
+In the Vercel project:
+
+1. Set the Framework Preset to **Flask**.
+2. Keep the root directory at the repository root.
+3. Leave the build and output directories empty.
+4. Redeploy with **Clear build cache** enabled.
+
+Vercel does not run the Streamlit app; it serves the Flask API from `server.py`
+and the static frontend from `public/`. The Streamlit app remains for local use.
 
 ### Predictions look overconfident on short or sarcastic text
 

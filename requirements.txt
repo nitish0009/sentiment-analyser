@@ -1,17 +1,14 @@
-# Sentiment Analysis System - Python dependencies
-# Tested with Python 3.14.4, scikit-learn 1.8.0, NLTK 3.10.4 and Streamlit 1.60.0.
-# Python 3.12+ is recommended.
+# Runtime dependencies for the Vercel / FastAPI-style deployment.
 #
-# Streamlit 1.60.0 is pinned because newer releases pulled a Starlette version
-# that broke Streamlit's static media endpoint in this environment. Pinning both
-# keeps the charts and UI reproducible.
+# The Streamlit UI, training scripts and report generation need additional
+# packages. Install those locally with:
+#
+#     pip install -r requirements-local.txt
+#
+# Vercel installs this slim file so the serverless function stays small.
 
-numpy>=2.0,<3
-pandas>=2.2,<4
-scikit-learn>=1.5,<2
-nltk>=3.9,<4
-matplotlib>=3.9,<4
-seaborn>=0.13,<1
-joblib>=1.4,<2
-streamlit==1.60.0
-starlette==0.49.3
+Flask==3.1.2
+numpy==2.4.4
+scikit-learn==1.8.0
+nltk==3.10.4
+joblib==1.5.3

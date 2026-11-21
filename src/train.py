@@ -415,7 +415,7 @@ def train(args: argparse.Namespace) -> int:
     print(f"Metadata         : {METADATA_PATH}")
     print(f"Charts/reports   : {REPORTS_DIR}")
     print("\nStart the web app with:")
-    print("    python -m streamlit run app.py")
+    print("    python -m streamlit run streamlit_app.py")
     return 0
 
 

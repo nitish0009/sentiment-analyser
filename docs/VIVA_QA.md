@@ -371,7 +371,7 @@ prediction and per-token explanations.
 python scripts/download_dataset.py
 python src/train.py
 python -m unittest discover -s tests -v
-python -m streamlit run app.py
+python -m streamlit run streamlit_app.py
 ```
 
 The split, random state, TF-IDF settings and versions are recorded in

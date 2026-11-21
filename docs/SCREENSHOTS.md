@@ -18,7 +18,7 @@ project.
 2. The app is running:
 
    ```bash
-   python -m streamlit run app.py
+   python -m streamlit run streamlit_app.py
    ```
 
 3. Open <http://127.0.0.1:8501> and wait for the sidebar badge **Model ready**.
@@ -47,7 +47,7 @@ project name and model status appear in each image.
 **Sample cards**
 
 The six clear examples and three tricky cases are defined in `SAMPLES` and
-`TRICKY_SAMPLES` at the top of `app.py`. They load and run automatically when the
+`TRICKY_SAMPLES` at the top of `streamlit_app.py`. They load and run automatically when the
 corresponding button is pressed.
 
 ---

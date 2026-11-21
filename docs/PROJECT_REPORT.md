@@ -522,11 +522,21 @@ binary limitation is explained, and no neutral result is fabricated.
 
 ```text
 .
-├── app.py
-├── requirements.txt
+├── streamlit_app.py            # Local Streamlit application
+├── server.py                   # Flask API for the Vercel deployment
+├── vercel.json                 # Vercel function configuration
+├── .python-version             # Vercel Python version
+├── requirements.txt            # Slim runtime dependencies for Vercel
+├── requirements-local.txt      # Streamlit, training and chart dependencies
 ├── README.md
 ├── evaluation_report.md
 ├── .streamlit/config.toml
+├── public/                     # Static analyzer UI served by Vercel
+│   ├── index.html
+│   ├── styles.css
+│   ├── app.js
+│   └── reports/                # Evaluation charts for the static UI
+├── nltk_data/                  # English stop-words and punkt_tab data
 ├── data/
 │   ├── README.md
 │   └── dataset.csv
@@ -594,7 +604,7 @@ the cache only holds a loaded object. Training happens exclusively in
 # 1. Environment
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 
 # 2. NLTK resources
 python scripts/setup_nltk.py
@@ -607,10 +617,33 @@ python scripts/download_dataset.py
 python src/train.py
 
 # 5. Run the app
-python -m streamlit run app.py
+python -m streamlit run streamlit_app.py
 ```
 
-### 8.4 Application workflow
+### 8.4 Deployment architecture
+
+The Streamlit application remains the local demonstration interface. Vercel
+cannot host Streamlit because it requires a long-lived WebSocket server, while
+Vercel Functions are request-scoped. The deployed version therefore uses a
+separate but equivalent serving path:
+
+- `server.py` exposes `GET /api/health`, `GET /api/metadata` and
+  `POST /api/predict` using Flask.
+- `public/` contains the static analyzer, performance dashboard and copied
+  evaluation charts.
+- The API loads the same saved Joblib classifier and vectorizer through
+  `src.predict`, so predictions and preprocessing are identical to the
+  Streamlit app.
+- `nltk_data/` is bundled in the function so the serverless environment does
+  not rely on a developer machine.
+- `requirements.txt` contains only the runtime packages needed by the API;
+  `requirements-local.txt` adds Streamlit, training and chart dependencies.
+
+This keeps the deployed application honest: it serves the measured binary
+classifier rather than retraining, calling an external API, or simulating a
+neutral class.
+
+### 8.5 Application workflow
 
 1. The user opens the Home page and sees the model snapshot.
 2. The user goes to **Sentiment Analyzer**.
@@ -623,7 +656,7 @@ python -m streamlit run app.py
 8. The user can compare the result with the real test-set metrics on the
    **Model Performance** page.
 
-### 8.5 Interface walkthrough
+### 8.6 Interface walkthrough
 
 The running application has four pages:
 
@@ -640,7 +673,7 @@ The running application has four pages:
 The optional `docs/SCREENSHOTS.md` guide explains how to capture your own
 interface images if they are required for a submission.
 
-### 8.6 Demonstration workflow
+### 8.7 Demonstration workflow
 
 **Presentation workflow (5–7 minutes):**
 
@@ -891,7 +924,7 @@ advanced NLP work.
 # Install
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 
 # NLTK data
 python scripts/setup_nltk.py
@@ -910,7 +943,7 @@ python -m unittest discover -s tests -v
 python src/predict.py "This movie was absolutely wonderful!" --show-cleaned
 
 # Web app
-python -m streamlit run app.py
+python -m streamlit run streamlit_app.py
 ```
 
 ## Appendix B — Artifact and metadata fields
